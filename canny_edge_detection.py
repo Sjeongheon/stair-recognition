@@ -3,9 +3,9 @@ import cv2
 import matplotlib.pyplot as plt
 
 def canny(img):
-    edge1 = cv2.Canny(img, 50, 200)
-    edge2 = cv2.Canny(img, 100, 200)
-    edge3 = cv2.Canny(img, 170, 230)
+    edge1 = cv2.Canny(img, 30, 200)
+    edge2 = cv2.Canny(img, 70, 200)
+    edge3 = cv2.Canny(img, 100, 230)
 
     plt.subplot(221)
     plt.title('original')
