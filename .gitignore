@@ -1,1 +1,9 @@
-Stair dataset with depth maps/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+artifacts/
+RGB-D stair dataset/
+.venv/
