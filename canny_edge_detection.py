@@ -3,8 +3,11 @@ import cv2
 import matplotlib.pyplot as plt
 
 def canny(img):
-    edge1 = cv2.Canny(img, 30, 200)
-    edge2 = cv2.Canny(img, 70, 200)
+    low1, high1 = 5, 10
+    edge1 = cv2.Canny(img, low1, high1)
+    low2, high2 = 70, 140
+    edge2 = cv2.Canny(img, low2, high2)
+    low3, high3 = 100, 230
     edge3 = cv2.Canny(img, 100, 230)
 
     plt.subplot(221)
@@ -13,17 +16,17 @@ def canny(img):
     plt.axis('off')
 
     plt.subplot(222)
-    plt.title('low : 50, high : 200')
+    plt.title('low : '+ str(low1) + ', high : ' + str(high1))
     plt.imshow(edge1, cmap ='gray')
     plt.axis('off')
 
     plt.subplot(223)
-    plt.title('low : 100, high : 200')
+    plt.title('low : '+ str(low2) + ', high : ' + str(high2))
     plt.imshow(edge2, cmap ='gray')
     plt.axis('off')
 
     plt.subplot(224)
-    plt.title('low : 170, high : 230')
+    plt.title('low : '+ str(low3) + ', high : ' + str(high3))
     plt.imshow(edge3, cmap ='gray')
     plt.axis('off')
     
@@ -31,5 +34,8 @@ def canny(img):
     plt.show()
 
 if __name__ == "__main__":
-    image = cv2.imread('images/stair.jpg', cv2.IMREAD_GRAYSCALE)
+    image = cv2.imread('images/stair2.jpg', cv2.IMREAD_GRAYSCALE)
     canny(image)
+
+    depth = cv2.imread('images/stair2_depth.png', cv2.IMREAD_GRAYSCALE)
+    canny(depth)

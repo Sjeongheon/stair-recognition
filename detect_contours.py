@@ -2,9 +2,9 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-def detect_edges(image, low_threshold=40, high_threshold=120):
+def detect_edges(image, low_threshold=80, high_threshold=240):
     blur = cv2.GaussianBlur(image, (3, 3), 0)
-    return cv2.Canny(blur, low_threshold, high_threshold)
+    return cv2.Canny(blur, low_threshold, high_threshold, apertureSize=3)
 
 def detect_horizontal_lines(contours, tolerance=10):
     horizontal_lines = []

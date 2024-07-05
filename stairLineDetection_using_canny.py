@@ -2,11 +2,11 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-def detect_edges(image, low_threshold=60, high_threshold=130):
-    blur = cv2.GaussianBlur(image, (3,3), 0)
+def detect_edges(image, low_threshold=9, high_threshold=240):
+    blur = cv2.GaussianBlur(image, (5,5), 0)
     return cv2.Canny(blur, low_threshold, high_threshold)
 
-def detect_horizontal_lines(edges, rho=1, theta=np.pi/180, threshold=100, min_line_length=50, max_line_gap=10):
+def detect_horizontal_lines(edges, rho=1, theta=np.pi/180, threshold=30, min_line_length=40, max_line_gap=5):
     lines = cv2.HoughLinesP(edges, rho, theta, threshold, minLineLength=min_line_length, maxLineGap=max_line_gap)
     horizontal_lines = []
     for line in lines:
