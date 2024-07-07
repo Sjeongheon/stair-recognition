@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-def detect_edges(image, low_threshold=70, high_threshold=210):
+def detect_edges(image, low_threshold=9, high_threshold=240):
     blur = cv2.GaussianBlur(image, (5,5), 0)
     return cv2.Canny(blur, low_threshold, high_threshold)
 
@@ -15,12 +15,16 @@ def detect_horizontal_lines(edges, rho=1, theta=np.pi/180, threshold=30, min_lin
                 horizontal_lines.append((x1, y1, x2, y2))
     return horizontal_lines
 
-def filter_edges_by_depth(image_lines, depth_image, min_depth, max_depth):
+def find_flat_areas(depth_image, threshold=10):
+    depth_diff = cv2.Laplacian(depth_image, cv2.CV_64F)
+    flat_areas = np.where(np.abs(depth_diff) < threshold, 255, 0).astype(np.uint8)
+    return flat_areas
+
+def filter_lines_by_flat_areas(lines, flat_areas):
     filtered_lines = []
-    for line in image_lines:
+    for line in lines:
         x1, y1, x2, y2 = line
-        depth_values = depth_image[y1:y2, x1:x2] if y1 != y2 else depth_image[y1, x1:x2]
-        if np.any((depth_values >= min_depth) & (depth_values <= max_depth)):
+        if flat_areas[y1, x1] == 255 and flat_areas[y2, x2] == 255:
             filtered_lines.append(line)
     return filtered_lines
 
@@ -35,6 +39,7 @@ if __name__ == "__main__":
 
     if image is None or depth_image is None:
         print("이미지를 읽는 데 문제가 있습니다.")
+        exit()
 
     # Edge Detection
     edges = detect_edges(image)
@@ -42,10 +47,11 @@ if __name__ == "__main__":
     # 수평 에지 검출
     image_lines = detect_horizontal_lines(edges)
 
-    # Depth 이미지 기반 필터링
-    min_depth = 50  # 적절한 최소 깊이 값 설정
-    max_depth = 200  # 적절한 최대 깊이 값 설정
-    filtered_lines = filter_edges_by_depth(image_lines, depth_image, min_depth, max_depth)
+    # Depth 이미지에서 평평한 영역 검출
+    flat_areas = find_flat_areas(depth_image)
+
+    # 평평한 영역을 사용하여 수평 에지 필터링
+    filtered_lines = filter_lines_by_flat_areas(image_lines, flat_areas)
 
     # 필터링된 에지를 원본 이미지에 그리기
     result_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
@@ -53,7 +59,7 @@ if __name__ == "__main__":
         cv2.line(result_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
     # Matplotlib을 사용하여 결과 시각화
-    fig, axs = plt.subplots(2, 2, figsize=(15, 10))
+    fig, axs = plt.subplots(2, 3, figsize=(20, 10))
 
     axs[0, 0].imshow(image, cmap='gray')
     axs[0, 0].set_title('Original Image')
@@ -62,6 +68,10 @@ if __name__ == "__main__":
     axs[0, 1].imshow(depth_image, cmap='gray')
     axs[0, 1].set_title('Depth Image')
     axs[0, 1].axis('off')
+
+    axs[0, 2].imshow(flat_areas, cmap='gray')
+    axs[0, 2].set_title('Flat Areas in Depth Image')
+    axs[0, 2].axis('off')
 
     axs[1, 0].imshow(edges, cmap='gray')
     axs[1, 0].set_title('Canny Edges')
